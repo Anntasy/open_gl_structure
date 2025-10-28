@@ -1,6 +1,6 @@
 CC			:=	g++
 FLAG		:=	#-Wall -Wextra -Werror
-LIBS		:=	-lglfw -lGLEW -lGL -lSOIL
+LIBS		:=	-lglfw -lGLEW -lGL -lSOIL -lGLU
 
 CNAMES	:=	main.cpp Shader.cpp VertexData.cpp
 

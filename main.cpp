@@ -1,5 +1,6 @@
 #include "h.hpp"
-#include "VertexData.hpp"
+// #include "VertexData.hpp"
+
 
 
 int main()
@@ -18,23 +19,11 @@ int main()
 		std::cerr << "No GLEW >;(";
 		return -1;
 	}
-	// v_capacity, v_step, i_capacity, i_step
-	VertexData vertex_data(4, 6, 2, 3);
 
-	vertex_data.add_triangle(-0.5f, 0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.7f, 0.2f, 0.5f);
+	VertexData vertex_data;
 
-	// GLfloat vertices[] = {
-	// 	-0.5f, 0.5f, 0.0f,  1.0f, 0.0f, 1.0f, 
-	// 	0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 
-	// 	0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 
-	// 	-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f
-	// };
-	// vertex_data.add_vertex(-0.5f, 0.5f, 0.0f,  1.0f, 0.0f, 1.0f);
-
-	// GLuint indices[]{
-	// 	0, 1, 2,
-	// 	0, 3, 1
-	// };
+	vertex_data.add_triangle(0.25f, 0.25f, 1.0f, 0.0f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f);
+	vertex_data.add_rectangle(0.6f, 0.7f, 0.3f, 0.0f, 1.0f, 0.0f, 0.0f);
 
 	GLuint element_buffer;
 
@@ -53,7 +42,28 @@ int main()
     vertex_data.move_to_buffer();
     vertex_data.mark_buffer();
 
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
     glBindVertexArray(0);
+
+    // for (auto v: vertex_data.vertices)
+    // {
+    // 	std::cout << v.position[0] << '\n';
+    // 	std::cout << v.position[1] << '\n'; 
+    // 	std::cout << v.position[2] << '\n'; 
+    // 	std::cout << v.color[0] << '\n'; 
+    // 	std::cout << v.color[1] << '\n';
+    // 	std::cout << v.color[2] << '\n';   
+    // }
+
+    // for (auto e: vertex_data.indices)
+    // {
+    // 	std::cout << e.triangle[0] << '\n';
+    // 	std::cout << e.triangle[1] << '\n'; 
+    // 	std::cout << e.triangle[2] << '\n';  
+    // }
+
+    // std::cout << "i_size: " << vertex_data.i_size << ", v_size: " << vertex_data.v_size << '\n';
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -61,13 +71,9 @@ int main()
 			
 		shader.use();
 
-		// red_value = (sin(glfwGetTime()) / 2) + 0.5;
-		// glUniform4f(vertex_color_location, red_value, 0.0f, 0.0f, 1.0f);
-
         glBindVertexArray(vertex_array);
-        glDrawElements(GL_TRIANGLES, vertex_data.i_size, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, vertex_data.indices.size()*3, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
-
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
