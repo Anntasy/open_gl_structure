@@ -1,40 +1,23 @@
 #include "h.hpp"
-#include "VertexData.hpp"
 
 
 int main()
 {
-	if (!glfwInit())
-	{
-		std::cerr << "No glfw >:(";
-		return -1;
-	}
-	GLFWwindow* window = glfwCreateWindow(800, 500, "My first glfw3 window", NULL, NULL);
-	glfwMakeContextCurrent(window);
+	check_glfw();
 
+    GLFWwindow* window = glfwCreateWindow(800, 500, "My first glfw3 window", NULL, NULL);
+    glfwMakeContextCurrent(window);
 
-	if (glewInit() != GLEW_OK)
-	{
-		std::cerr << "No GLEW >;(";
-		return -1;
-	}
-	// v_capacity, v_step, i_capacity, i_step
-	VertexData vertex_data(4, 6, 2, 3);
+    glfwSetKeyCallback(window, key_callback);
 
-	vertex_data.add_triangle(-0.5f, 0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.7f, 0.2f, 0.5f);
+	check_glew();
 
-	// GLfloat vertices[] = {
-	// 	-0.5f, 0.5f, 0.0f,  1.0f, 0.0f, 1.0f, 
-	// 	0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 
-	// 	0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 
-	// 	-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f
-	// };
-	// vertex_data.add_vertex(-0.5f, 0.5f, 0.0f,  1.0f, 0.0f, 1.0f);
+	VertexData vertex_data;
+	Texture texture_data;
 
-	// GLuint indices[]{
-	// 	0, 1, 2,
-	// 	0, 3, 1
-	// };
+	GLuint texture = texture_data.add_texture("wall.png");
+	vertex_data.add_triangle(0.25f, 0.25f, 1.0f, 0.0f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f);
+	vertex_data.add_rectangle(0.6f, 0.7f, 0.3f, 0.0f, 1.0f, 0.0f, 0.0f);
 
 	GLuint element_buffer;
 
@@ -53,21 +36,25 @@ int main()
     vertex_data.move_to_buffer();
     vertex_data.mark_buffer();
 
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
     glBindVertexArray(0);
 
 	while (!glfwWindowShouldClose(window))
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
-			
+		
 		shader.use();
 
-		// red_value = (sin(glfwGetTime()) / 2) + 0.5;
-		// glUniform4f(vertex_color_location, red_value, 0.0f, 0.0f, 1.0f);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glUniform1i(glGetUniformLocation(shader.program, "texture_sample1"), 0);
 
         glBindVertexArray(vertex_array);
-        glDrawElements(GL_TRIANGLES, vertex_data.i_size, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, vertex_data.indices.size()*3, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
+        glBindTexture(GL_TEXTURE_2D, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
