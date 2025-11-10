@@ -1,11 +1,2 @@
-1) on the base of arg:
-vertex_add()
-index_add()
-2) f() add_triangle(1_v, 2_v, 3_v); add_rectangle(1_v, 2_v)
-(< capacity!!)
-
-
-
-
-extend_capacity()
-
+include textures + class Texture
+add_texture(file_name) -> texture (type GLuint)
