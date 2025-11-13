@@ -1,40 +1,82 @@
 #include "h.hpp"
-#include "VertexData.hpp"
+
+glm::vec3 cam_pos = glm::vec3(0.0f, 0.0f, 1.0f);
+glm::vec3 cam_front = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cam_up = glm::vec3(0.0f, -1.0f, 0.0f);
+bool keys[1024];
+
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GL_TRUE);
+
+    if (action == GLFW_PRESS)
+    {
+    	keys[key] = true;
+    }
+    else if (action == GLFW_RELEASE)
+    {
+    	keys[key] = false;
+    }
+}
+
+
+void make_move()
+{
+    GLfloat cam_speed = 0.01f;
+
+	if (keys[GLFW_KEY_W])
+    {
+        cam_pos += cam_speed*cam_front;
+    }
+    if (keys[GLFW_KEY_S])
+    {
+        cam_pos -= cam_speed*cam_front;
+    }
+    if (keys[GLFW_KEY_A])
+    {
+        cam_pos -= glm::normalize(glm::cross(cam_front, cam_up)) * cam_speed;
+    }
+    if (keys[GLFW_KEY_D])
+    {
+        cam_pos += glm::normalize(glm::cross(cam_front, cam_up)) * cam_speed;
+    }
+}
+
+// void show_m(const glm::mat4 &m)
+// {
+// 	for (int x=0; x<4; x++) 
+// 	{
+//         for (int y=0; y<4; y++) 
+//             std::cout << m[x][y] << "\t";
+
+//     	std::cout << std::endl;
+// 	}
+// 	std::cout << std::endl;
+// 	std::cout << std::endl;	
+// }
 
 
 int main()
 {
-	if (!glfwInit())
-	{
-		std::cerr << "No glfw >:(";
-		return -1;
-	}
-	GLFWwindow* window = glfwCreateWindow(800, 500, "My first glfw3 window", NULL, NULL);
-	glfwMakeContextCurrent(window);
+	check_glfw();
 
+    GLFWwindow* window = glfwCreateWindow(800, 800, "window", NULL, NULL);
+    glfwMakeContextCurrent(window);
 
-	if (glewInit() != GLEW_OK)
-	{
-		std::cerr << "No GLEW >;(";
-		return -1;
-	}
-	// v_capacity, v_step, i_capacity, i_step
-	VertexData vertex_data(4, 6, 2, 3);
+    glfwSetKeyCallback(window, key_callback);
 
-	vertex_data.add_triangle(-0.5f, 0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.7f, 0.2f, 0.5f);
+	check_glew();
 
-	// GLfloat vertices[] = {
-	// 	-0.5f, 0.5f, 0.0f,  1.0f, 0.0f, 1.0f, 
-	// 	0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 
-	// 	0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 
-	// 	-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f
-	// };
-	// vertex_data.add_vertex(-0.5f, 0.5f, 0.0f,  1.0f, 0.0f, 1.0f);
+	VertexData vertex_data;
+	Texture texture_data;
 
-	// GLuint indices[]{
-	// 	0, 1, 2,
-	// 	0, 3, 1
-	// };
+	GLuint texture = texture_data.add_texture("e4.png");
+	GLuint texture2 = texture_data.add_texture("wall.png");
+
+	// vertex_data.add_triangle(0.25f, 0.25f, 1.0f, 0.0f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f);
+	vertex_data.add_rectangle(-0.5f, -0.5f, 0.5f, 0.5f, 0.3f, 0.3f, 0.5f);
 
 	GLuint element_buffer;
 
@@ -53,24 +95,66 @@ int main()
     vertex_data.move_to_buffer();
     vertex_data.mark_buffer();
 
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
     glBindVertexArray(0);
+
+    // glEnable(GL_CULL_FACE);
+
+	glm::mat4 model(1.0f); 
+	// model = glm::rotate(model, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	// show_m(model);
+
+	// glm::mat4 view(1.0f);
+	// view = glm::translate(view, glm::vec3(0.3f, 0.4f, -1.0f));
+	// show_m(view);
+
+	glm::mat4 view = glm::lookAt(
+	cam_pos,
+    cam_pos+cam_front,
+    cam_up);
+
+	glm::mat4 projection(1.0f);
+	projection = glm::perspective(glm::radians(45.0f), HEIGHT/WIDTH, 0.05f, 50.0f);
+	// show_m(projection);
+
+	glm::mat4 transformation(1);
+	transformation = projection*view*model;
+	// show_m(transformation);
 
 	while (!glfwWindowShouldClose(window))
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
-			
+		
 		shader.use();
 
-		// red_value = (sin(glfwGetTime()) / 2) + 0.5;
-		// glUniform4f(vertex_color_location, red_value, 0.0f, 0.0f, 1.0f);
+		glm::mat4 view = glm::lookAt(
+		cam_pos,
+	    cam_pos+cam_front,
+	    cam_up);
+
+		transformation = projection*view*model;
+
+		GLint matrix_id = glGetUniformLocation(shader.program, "transformation");
+		glUniformMatrix4fv(matrix_id, 1, GL_FALSE, glm::value_ptr(transformation)); // &transformation[0][0]
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glUniform1i(glGetUniformLocation(shader.program, "texture_sample1"), 0);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture2);
+		glUniform1i(glGetUniformLocation(shader.program, "texture_sample2"), 1);
 
         glBindVertexArray(vertex_array);
-        glDrawElements(GL_TRIANGLES, vertex_data.i_size, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, vertex_data.indices.size()*3, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
+        glBindTexture(GL_TEXTURE_2D, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+		make_move();
 	}
 
 	glfwDestroyWindow(window);
