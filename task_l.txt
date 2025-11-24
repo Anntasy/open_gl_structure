@@ -1,11 +1,3 @@
-1) on the base of arg:
-vertex_add()
-index_add()
-2) f() add_triangle(1_v, 2_v, 3_v); add_rectangle(1_v, 2_v)
-(< capacity!!)
-
-
-
-
-extend_capacity()
-
+make a function (VertexData)
+creates a cube
+add_cube(v1, v2, v3, v4)
