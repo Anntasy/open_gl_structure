@@ -1,12 +1,12 @@
 CC			:=	g++
 FLAG		:=	#-Wall -Wextra -Werror
-LIBS		:=	-lglfw -lGLEW -lGL -lSOIL
+LIBS		:=	-lglfw -lGLEW -lGL -lSOIL -lGLU
 
-CNAMES	:=	main.cpp Shader.cpp VertexData.cpp
+CNAMES	:=	main.cpp Shader.cpp VertexData.cpp Texture.cpp utilities.cpp Camera.cpp
 
 ONAMES		:=	$(CNAMES:.cpp=.o)
 
-HNAMES	:=	h.hpp Shader.hpp VertexData.hpp
+HNAMES	:=	h.hpp Shader.hpp VertexData.hpp Texture.hpp Camera.hpp
 
 NAME		:=	project
 RM			:=	rm -f
