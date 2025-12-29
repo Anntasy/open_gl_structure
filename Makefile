@@ -1,18 +1,18 @@
 CC			:=	g++
 FLAG		:=	#-Wall -Wextra -Werror
-LIBS		:=	-lglfw -lGLEW -lGL -lSOIL
+LIBS		:=	-lglfw -lGLEW -lGL -lSOIL -lGLU
 
-CNAMES	:=	main.cpp Shader.cpp VertexData.cpp
+SRCNAMES	:=	main.cpp Shader.cpp VertexData.cpp Texture.cpp utilities.cpp Camera.cpp vars.cpp
 
-ONAMES		:=	$(CNAMES:.cpp=.o)
+CNAMES		:=	$(addprefix src/,$(SRCNAMES))
 
-HNAMES	:=	h.hpp Shader.hpp VertexData.hpp
+ONAMES		:=	$(CNAMES:.c=.o)
+
+HNAMES_ORIG	:=	h.hpp Shader.hpp VertexData.hpp Texture.hpp Camera.hpp vars.hpp
+HNAMES		:=	$(addprefix include/, $(HNAMES))
 
 NAME		:=	project
 RM			:=	rm -f
-
-test: all
-	@./$(NAME)
 
 all: $(NAME)
 
@@ -20,7 +20,7 @@ $(NAME): $(ONAMES) $(HNAMES) Makefile
 	@$(CC) $(ONAMES) -o $(NAME) $(LIBS)
 	@printf "Makefile: $(NAME) successfuly built\n"
 
-%.o: %.cpp $(HNAMES) Makefile
+%.o: %.c $(HNAMES) Makefile
 	@$(CC) $(FLAG) -c $< -o $@
 
 clean:
