@@ -6,7 +6,7 @@ SRCNAMES	:=	main.cpp Shader.cpp VertexData.cpp Texture.cpp utilities.cpp Camera.
 
 CNAMES		:=	$(addprefix src/,$(SRCNAMES))
 
-ONAMES		:=	$(CNAMES:.c=.o)
+ONAMES		:=	$(CNAMES:.cpp=.o)
 
 HNAMES_ORIG	:=	h.hpp Shader.hpp VertexData.hpp Texture.hpp Camera.hpp vars.hpp
 HNAMES		:=	$(addprefix include/, $(HNAMES))
@@ -20,7 +20,7 @@ $(NAME): $(ONAMES) $(HNAMES) Makefile
 	@$(CC) $(ONAMES) -o $(NAME) $(LIBS)
 	@printf "Makefile: $(NAME) successfuly built\n"
 
-%.o: %.c $(HNAMES) Makefile
+%.o: %.cpp $(HNAMES) Makefile
 	@$(CC) $(FLAG) -c $< -o $@
 
 clean:
